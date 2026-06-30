@@ -1,10 +1,26 @@
-# orion-operaciones-ropa
+# indicadores-cambios-y-muertos
 
 Plataforma de indicadores para Recuperación Cambios y Muertos — Operaciones Ropa.
 
-## v4.1.0 Diseño Ejecutivo
-- Se eliminó la palabra ORION de la interfaz visible.
-- Menú desplegable lateral.
-- Panel Ejecutivo como inicio.
-- Tarjetas KPI modernas.
-- Persistencia de Excel.
+## Versión v5.0
+
+Incluye todas las pestañas trabajadas:
+- Panel Ejecutivo
+- Día Anterior
+- Reporte Semanal
+- Reporte Mensual
+- Conversión
+- Recuperación Económica
+- Productividad
+- Recorridos
+- Rankings
+- Macro
+- Diagnóstico
+- Configuración
+
+## Ejecutar
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
