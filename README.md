@@ -1,19 +1,10 @@
-# indicadores-cambios-y-muertos
+# ORION APP13 - Fix arranque GitHub
 
-Versión con navegación por pestañas superiores, como la estructura anterior.
+Corrección crítica:
+- app.py con saltos de línea reales.
+- requirements.txt con una dependencia por línea.
 
-## Incluye
-- 0. Día Anterior / Pendiente
-- 1. Panel Ejecutivo
-- 2. Reporte Semanal
-- 3. Reporte Mensual
-- 4. Conversión
-- 5. Recuperación Económica
-- 6. Productividad por Colaborador
-- 7. Productividad por Actividad
-- 8. Eficiencia Operativa
-- 9. Cumplimiento de Recorridos
-- 10. Rankings
-- 11. Macro
-- 12. Diagnóstico
-- 13. Configuración de Metas
+Motivo:
+En GitHub el app.py estaba en una sola línea:
+`import streamlit as st import traceback ...`
+Eso genera SyntaxError antes de que Streamlit pueda mostrar el traceback, por eso aparecía "Oh no".
