@@ -398,7 +398,6 @@ if is_admin:
         st.sidebar.success("Archivo eliminado")
         st.rerun()
 
-pagina = sidebar_menu()
 sidebar_footer()
 
 render_header(is_admin=is_admin)
@@ -416,30 +415,15 @@ tiendas = sorted(set(
     + (co_all["Tienda"].dropna().astype(str).tolist() if not co_all.empty and "Tienda" in co_all.columns else [])
 ))
 
-titulo_modulo = pagina.split(" ", 1)[1]
-subtitulo_map = {
-    "📊 Panel Ejecutivo": "Resumen general de indicadores",
-    "📅 Día Anterior": "Ingresos y pendiente por procesar",
-    "📈 Reporte Semanal": "Indicadores por semana ISO",
-    "📆 Reporte Mensual": "Indicadores acumulados por mes",
-    "🔄 Conversión": "Conversión Semanal Dev → Venta",
-    "💲 Recuperación Económica": "Importe recuperado y pendiente",
-    "👥 Productividad": "Productividad por colaborador y actividad",
-    "🚶 Recorridos": "Cumplimiento de recorridos",
-    "🏆 Rankings": "Top y bottom tiendas / colaboradores",
-    "📊 Macro": "Últimas 4 semanas y últimos 3 meses",
-    "🩺 Diagnóstico": "Validación de estructura y columnas",
-    "⚙️ Configuración": "Metas, tiendas del proyecto y parámetros",
-}
-section_title(titulo_modulo, subtitulo_map.get(pagina, ""))
-
+st.markdown("### Filtros globales")
 colf1, colf2, colf3 = st.columns([2.1, 1.8, .7])
 with colf1:
     f_tienda = st.multiselect("Tienda", tiendas, placeholder="Todas las tiendas")
 with colf2:
     periodo = st.selectbox("Periodo", ["Semana actual", "Mes actual", "Todo el archivo"], index=2)
 with colf3:
-    st.button("Filtros", use_container_width=True)
+    st.write("")
+    st.button("Aplicar filtros", use_container_width=True)
 
 op_base, co_base = op_all.copy(), co_all.copy()
 if f_tienda:
@@ -457,11 +441,46 @@ mes_df = resumen_por_mes(op_base, co_base)
 prod_df = productividad_colaborador(op)
 conv_df, conv_kpis = conversion_semanal(co)
 
+tabs_names = [
+    "0. Día Anterior / Pendiente",
+    "1. Panel Ejecutivo",
+    "2. Reporte Semanal",
+    "3. Reporte Mensual",
+    "4. Conversión",
+    "5. Recuperación Económica",
+    "6. Productividad por Colaborador",
+    "7. Productividad por Actividad",
+    "8. Eficiencia Operativa",
+    "9. Cumplimiento de Recorridos",
+    "10. Rankings",
+    "11. Macro",
+    "12. Diagnóstico",
+    "13. Configuración de Metas",
+]
+tabs = st.tabs(tabs_names)
+
+
 # =============================
 # PESTAÑAS
 # =============================
 
-if pagina == "📊 Panel Ejecutivo":
+with tabs[0]:
+    section_title("Día Anterior / Pendiente", "Ingresos y pendiente por procesar")
+    render_kpis(resumen)
+    st.markdown("### Detalle por tienda")
+    st.dataframe(detalle, width="stretch", hide_index=True)
+
+    st.markdown("### Detalle de registros subidos")
+    tienda_det = st.selectbox("Filtrar tienda para detalle", ["Todas"] + tiendas, key="detalle_tienda_dia")
+    reg = op.copy()
+    if tienda_det != "Todas" and not reg.empty and "Tienda" in reg.columns:
+        reg = reg[reg["Tienda"] == tienda_det]
+    cols = [c for c in ["Fecha", "Tienda", "Nombre", "Actividad Realizada", "Número de Piezas", "Área", "Motivo de ingreso", "Ocurrencia"] if c in reg.columns]
+    st.dataframe(reg[cols] if cols else reg, width="stretch", hide_index=True)
+    excel_download(reg[cols] if cols else reg, "detalle_registros_dia_anterior.xlsx", "Descargar detalle en Excel")
+
+with tabs[1]:
+    section_title("Panel Ejecutivo", "Resumen general de indicadores")
     render_kpis(resumen)
     st.write("")
     c1, c2, c3 = st.columns([1.15, 1.15, .85])
@@ -504,21 +523,8 @@ if pagina == "📊 Panel Ejecutivo":
     with c5:
         panel_table("Bottom 5 tiendas", detalle.tail(5) if not detalle.empty else detalle)
 
-elif pagina == "📅 Día Anterior":
-    render_kpis(resumen)
-    st.markdown("### Detalle por tienda")
-    st.dataframe(detalle, width="stretch", hide_index=True)
-
-    st.markdown("### Detalle de registros subidos")
-    tienda_det = st.selectbox("Filtrar tienda para detalle", ["Todas"] + tiendas)
-    reg = op.copy()
-    if tienda_det != "Todas" and not reg.empty and "Tienda" in reg.columns:
-        reg = reg[reg["Tienda"] == tienda_det]
-    cols = [c for c in ["Fecha", "Tienda", "Nombre", "Actividad Realizada", "Número de Piezas", "Área", "Motivo de ingreso", "Ocurrencia"] if c in reg.columns]
-    st.dataframe(reg[cols] if cols else reg, width="stretch", hide_index=True)
-    excel_download(reg[cols] if cols else reg, "detalle_registros_dia_anterior.xlsx", "Descargar detalle en Excel")
-
-elif pagina == "📈 Reporte Semanal":
+with tabs[2]:
+    section_title("Reporte Semanal", "Indicadores por semana ISO")
     render_kpis(resumen)
     c1, c2 = st.columns(2)
     with c1:
@@ -536,7 +542,8 @@ elif pagina == "📈 Reporte Semanal":
             st.info("Sin información.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-elif pagina == "📆 Reporte Mensual":
+with tabs[3]:
+    section_title("Reporte Mensual", "Indicadores acumulados por mes")
     render_kpis(resumen)
     c1, c2 = st.columns(2)
     with c1:
@@ -551,7 +558,8 @@ elif pagina == "📆 Reporte Mensual":
             st.info("Sin información.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-elif pagina == "🔄 Conversión":
+with tabs[4]:
+    section_title("Conversión", "Conversión Semanal Dev → Venta")
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1: kpi_card("Dev Pzs Semana", formato_numero(conv_kpis.get("Dev Pzs Semana",0)), "devolución", "↩", PRICE_BLUE)
     with c2: kpi_card("Conversión Pzs", formato_numero(conv_kpis.get("Conversión Dev → Venta Pzs",0)), "misma semana", "🔄", PRICE_GREEN)
@@ -562,14 +570,16 @@ elif pagina == "🔄 Conversión":
     st.dataframe(conv_df, width="stretch", hide_index=True)
     excel_download(conv_df, "conversion_semanal_dev_venta.xlsx", "Descargar conversión en Excel")
 
-elif pagina == "💲 Recuperación Económica":
+with tabs[5]:
+    section_title("Recuperación Económica", "Importe recuperado y pendiente")
     c1, c2, c3 = st.columns(3)
     with c1: kpi_card("Recuperación $", formato_pesos(conv_kpis.get("Conversión Dev → Venta $",0)), "venta recuperada", "$", PRICE_GREEN)
     with c2: kpi_card("Venta No Convertida $", formato_pesos(conv_kpis.get("Venta No Convertida $",0)), "pendiente", "⏱", PRICE_ORANGE)
     with c3: kpi_card("% Conversión", formato_porcentaje(conv_kpis.get("% Conversión Semanal Dev → Venta",0)), "piezas", "%", PRICE_CYAN)
     st.dataframe(conv_df, width="stretch", hide_index=True)
 
-elif pagina == "👥 Productividad":
+with tabs[6]:
+    section_title("Productividad por Colaborador", "Ranking de productividad por colaborador")
     c1, c2 = st.columns([.9, 1.1])
     with c1:
         panel_table("Productividad por colaborador", prod_df)
@@ -584,22 +594,42 @@ elif pagina == "👥 Productividad":
             st.info("Sin información.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-elif pagina == "🚶 Recorridos":
+with tabs[7]:
+    section_title("Productividad por Actividad", "Recolección, habilitado y ubicado")
+    if not op.empty:
+        cols = [c for c in ["Recolección de Muertos", "Acondicionado", "Ubicado", "Recorridos"] if c in op.columns]
+        act = pd.DataFrame({"Actividad": cols, "Piezas": [op[c].sum() for c in cols]})
+        st.dataframe(act, width="stretch", hide_index=True)
+        if not act.empty:
+            fig = px.bar(act, x="Actividad", y="Piezas", text="Piezas")
+            fig.update_layout(height=420)
+            st.plotly_chart(fig, width="stretch")
+    else:
+        st.warning("Sin datos operativos.")
+
+with tabs[8]:
+    section_title("Eficiencia Operativa", "Cumplimiento por tienda")
+    eficiencia = detalle.copy()
+    st.dataframe(eficiencia, width="stretch", hide_index=True)
+
+with tabs[9]:
+    section_title("Cumplimiento de Recorridos", "Meta vs real")
     rec = pd.DataFrame()
     if not op.empty and "Tienda" in op.columns:
         rec = op.groupby("Tienda", dropna=False).agg(Recorridos=("Recorridos","sum")).reset_index()
         rec["Meta"] = 47
         rec["% Cumplimiento"] = rec["Recorridos"] / rec["Meta"] * 100
-    render_kpis(resumen)
     st.dataframe(rec, width="stretch", hide_index=True)
 
-elif pagina == "🏆 Rankings":
+with tabs[10]:
+    section_title("Rankings", "Top y bottom tiendas / colaboradores")
     st.markdown("### Ranking de tiendas")
     st.dataframe(detalle, width="stretch", hide_index=True)
     st.markdown("### Ranking de colaboradores")
     st.dataframe(prod_df, width="stretch", hide_index=True)
 
-elif pagina == "📊 Macro":
+with tabs[11]:
+    section_title("Macro", "Últimas 4 semanas y últimos 3 meses")
     st.markdown("### Últimas 4 semanas")
     ult4 = sem_df.tail(4) if not sem_df.empty else sem_df
     st.dataframe(ult4, width="stretch", hide_index=True)
@@ -607,7 +637,8 @@ elif pagina == "📊 Macro":
     ult3 = mes_df.tail(3) if not mes_df.empty else mes_df
     st.dataframe(ult3, width="stretch", hide_index=True)
 
-elif pagina == "🩺 Diagnóstico":
+with tabs[12]:
+    section_title("Diagnóstico", "Validación de estructura y columnas")
     diag = pd.DataFrame({
         "Elemento": ["Hojas cargadas", "Registros operación", "Registros comercial", "Columnas operación", "Columnas comercial"],
         "Valor": [len(excel_actual.keys()), len(op_all), len(co_all), ", ".join(op_all.columns[:20]) if not op_all.empty else "Sin datos", ", ".join(co_all.columns[:20]) if not co_all.empty else "Sin datos"]
@@ -616,7 +647,8 @@ elif pagina == "🩺 Diagnóstico":
     with st.expander("Ver hojas detectadas"):
         st.write(list(excel_actual.keys()))
 
-elif pagina == "⚙️ Configuración":
+with tabs[13]:
+    section_title("Configuración de Metas", "Metas, tiendas del proyecto y parámetros")
     if not is_admin:
         st.warning("Sólo administrador puede modificar configuración.")
     else:
