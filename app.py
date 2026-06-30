@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from datetime import datetime
+import base64
 
 import streamlit as st
 import plotly.express as px
@@ -44,58 +45,72 @@ def aplicar_estilos():
         }}
 
         .block-container {{
-            max-width: 1580px;
-            padding-top: 0.8rem;
-            padding-left: 2.2rem;
-            padding-right: 2.2rem;
+            max-width: 100% !important;
+            padding-top: 1rem !important;
+            padding-left: 2.5rem !important;
+            padding-right: 2.5rem !important;
         }}
 
         section[data-testid="stSidebar"] {{
             background:#F7F8FB;
             border-right:1px solid #E5EAF3;
-            min-width: 315px !important;
-            max-width: 315px !important;
         }}
 
         section[data-testid="stSidebar"] > div {{
             padding-top: 1.1rem;
         }}
 
+        .top-shell {{
+            width:100%;
+            border-bottom:3px solid {PRICE_PINK};
+            margin-bottom:26px;
+            padding-bottom:18px;
+        }}
+
         .main-header {{
+            width:100%;
             display:grid;
-            grid-template-columns: 170px 1fr 235px 270px;
+            grid-template-columns: 160px minmax(360px, 1fr) 220px 250px;
             align-items:center;
-            gap: 22px;
-            border-bottom: 3px solid {PRICE_PINK};
-            padding: 10px 0 20px 0;
-            margin-bottom: 34px;
+            gap:22px;
         }}
 
         .logo-wrap {{
+            min-height:86px;
             display:flex;
             justify-content:center;
             align-items:center;
         }}
 
+        .logo-fallback {{
+            color:{PRICE_BLUE};
+            font-size:25px;
+            font-weight:900;
+            line-height:0.9;
+            text-align:center;
+        }}
+
         .title-wrap {{
-            border-left: 3px solid {PRICE_PINK};
-            padding-left: 24px;
+            border-left:3px solid {PRICE_PINK};
+            padding-left:24px;
+            min-width:0;
         }}
 
         .main-title {{
-            font-size: 30px;
-            line-height: 1.05;
-            font-weight: 900;
-            color: {PRICE_DARK};
-            letter-spacing: -0.4px;
-            margin: 0;
+            font-size:34px;
+            line-height:1.05;
+            font-weight:900;
+            color:{PRICE_DARK};
+            letter-spacing:-0.6px;
+            margin:0;
+            white-space:normal;
         }}
 
         .main-subtitle {{
-            margin-top: 8px;
+            margin-top:8px;
             color:#6B7280;
-            font-size: 16px;
-            font-weight: 650;
+            font-size:16px;
+            font-weight:650;
         }}
 
         .date-box {{
@@ -104,6 +119,7 @@ def aplicar_estilos():
             font-weight:900;
             font-size:16px;
             line-height:1.45;
+            white-space:nowrap;
         }}
 
         .date-box span {{
@@ -117,19 +133,21 @@ def aplicar_estilos():
             gap:14px;
             border-left:1px solid #D8DEE9;
             padding-left:20px;
+            white-space:nowrap;
         }}
 
         .avatar {{
-            width:58px;
-            height:58px;
+            width:56px;
+            height:56px;
             border-radius:50%;
             background:{PRICE_PINK};
             color:white;
             display:flex;
             align-items:center;
             justify-content:center;
-            font-size:26px;
+            font-size:25px;
             font-weight:900;
+            flex-shrink:0;
         }}
 
         .user-role {{
@@ -143,17 +161,9 @@ def aplicar_estilos():
             font-size:14px;
         }}
 
-        .module-row {{
-            display:flex;
-            align-items:flex-start;
-            justify-content:space-between;
-            gap:20px;
-            margin-bottom:20px;
-        }}
-
         .module-title {{
-            font-size: 30px;
-            font-weight: 900;
+            font-size:32px;
+            font-weight:900;
             color:{PRICE_DARK};
             margin:0;
             line-height:1.05;
@@ -163,20 +173,7 @@ def aplicar_estilos():
             color:#6B7280;
             font-size:16px;
             margin-top:6px;
-        }}
-
-        .filter-row {{
-            display:grid;
-            grid-template-columns: 1.15fr 1fr 120px;
-            gap:16px;
-            margin-bottom:24px;
-        }}
-
-        div[data-testid="stMetric"] {{
-            background:white;
-            border:1px solid #E6EAF2;
-            border-radius:16px;
-            padding:18px;
+            margin-bottom:18px;
         }}
 
         .kpi-card {{
@@ -184,57 +181,62 @@ def aplicar_estilos():
             border:1px solid #E6EAF2;
             border-radius:18px;
             min-height:170px;
-            padding:22px 20px;
+            padding:20px 18px;
             box-shadow:0 8px 24px rgba(17,24,39,.07);
+            overflow:hidden;
         }}
 
         .kpi-top {{
             display:flex;
             align-items:center;
-            gap:14px;
+            gap:12px;
+            margin-bottom:10px;
         }}
 
         .kpi-icon {{
-            width:56px;
-            height:56px;
-            min-width:56px;
+            width:54px;
+            height:54px;
+            min-width:54px;
             border-radius:50%;
             display:flex;
             align-items:center;
             justify-content:center;
             color:white;
-            font-size:24px;
+            font-size:23px;
             font-weight:900;
         }}
 
         .kpi-label {{
             font-size:15px;
             font-weight:900;
+            line-height:1.15;
+            overflow-wrap:anywhere;
         }}
 
         .kpi-value {{
-            font-size:28px;
+            font-size:26px;
             font-weight:900;
             color:{PRICE_DARK};
-            margin-left:70px;
-            margin-top:8px;
+            margin-left:66px;
+            margin-top:6px;
             line-height:1.05;
-            white-space: nowrap;
+            word-break:normal;
+            overflow-wrap:normal;
         }}
 
         .kpi-note {{
-            margin-left:70px;
+            margin-left:66px;
             color:#6B7280;
             font-size:14px;
             margin-top:5px;
         }}
 
         .kpi-badge {{
-            margin-left:70px;
+            margin-left:66px;
             margin-top:12px;
             border-radius:9px;
             padding:8px 10px;
-            font-size:13px;
+            font-size:12px;
             font-weight:850;
             text-align:center;
         }}
@@ -256,10 +258,10 @@ def aplicar_estilos():
         }}
 
         .side-section {{
-            font-size: 22px;
+            font-size:22px;
             color:{PRICE_DARK};
             font-weight:900;
-            margin: 8px 0 12px 0;
+            margin:8px 0 12px 0;
         }}
 
         .sidebar-card {{
@@ -292,10 +294,6 @@ def aplicar_estilos():
             font-size:13px;
         }}
 
-        .stRadio > div {{
-            gap: 2px;
-        }}
-
         div[data-testid="stDataFrame"] {{
             border-radius:14px;
             overflow:hidden;
@@ -308,8 +306,11 @@ def aplicar_estilos():
             .date-box, .user-box {{
                 display:none;
             }}
+            .main-title {{
+                font-size:28px;
+            }}
             .kpi-value {{
-                font-size:24px;
+                font-size:23px;
             }}
         }}
         </style>
@@ -318,36 +319,39 @@ def aplicar_estilos():
     )
 
 
-def render_header(is_admin: bool):
-    logo_html = ""
+def logo_html():
     for logo_name in ["assets/logo_price.png", "assets/logo.png"]:
-        if Path(logo_name).exists():
-            import base64
-            img = Path(logo_name).read_bytes()
-            ext = Path(logo_name).suffix.replace(".", "") or "png"
-            logo_html = f'<img src="data:image/{ext};base64,{base64.b64encode(img).decode()}" style="max-width:145px;max-height:90px;">'
-            break
+        logo = Path(logo_name)
+        if logo.exists():
+            ext = logo.suffix.replace(".", "") or "png"
+            data = base64.b64encode(logo.read_bytes()).decode()
+            return f'<img src="data:image/{ext};base64,{data}" style="max-width:145px;max-height:86px;">'
+    return '<div class="logo-fallback">Price<br>Shoes</div>'
 
+
+def render_header(is_admin: bool):
     now = datetime.now()
-    fecha = now.strftime("%d/%b/%Y").replace("Jun", "jun").replace("Jun", "jun")
+    fecha = now.strftime("%d/%m/%Y")
     hora = now.strftime("%I:%M %p").lower().replace("am", "a. m.").replace("pm", "p. m.")
     role = "Administrador" if is_admin else "Consulta"
     avatar = "A" if is_admin else "C"
 
     st.markdown(
         f"""
-        <div class="main-header">
-            <div class="logo-wrap">{logo_html}</div>
-            <div class="title-wrap">
-                <div class="main-title">Recuperación Cambios y Muertos</div>
-                <div class="main-subtitle">Operaciones Ropa &nbsp; | &nbsp; Indicadores Compañía</div>
-            </div>
-            <div class="date-box">📅 {fecha}<br><span>{hora}</span></div>
-            <div class="user-box">
-                <div class="avatar">{avatar}</div>
-                <div>
-                    <div class="user-role">{role}</div>
-                    <div class="user-sub">Rol: {role}</div>
+        <div class="top-shell">
+            <div class="main-header">
+                <div class="logo-wrap">{logo_html()}</div>
+                <div class="title-wrap">
+                    <div class="main-title">Recuperación Cambios y Muertos</div>
+                    <div class="main-subtitle">Operaciones Ropa &nbsp; | &nbsp; Indicadores Compañía</div>
+                </div>
+                <div class="date-box">📅 {fecha}<br><span>{hora}</span></div>
+                <div class="user-box">
+                    <div class="avatar">{avatar}</div>
+                    <div>
+                        <div class="user-role">{role}</div>
+                        <div class="user-sub">Rol: {role}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -478,7 +482,9 @@ tiendas = sorted(set(
 op = op_all.copy()
 co = co_all.copy()
 
-st.markdown('<div class="module-row"><div><div class="module-title">' + pagina.split(" ", 1)[1] + '</div><div class="module-subtitle">Resumen general de indicadores</div></div></div>', unsafe_allow_html=True)
+titulo_modulo = pagina.split(" ", 1)[1]
+subtitulo = "Resumen general de indicadores" if pagina == "📊 Panel Ejecutivo" else "Indicadores de operación"
+st.markdown(f'<div class="module-title">{titulo_modulo}</div><div class="module-subtitle">{subtitulo}</div>', unsafe_allow_html=True)
 
 colf1, colf2, colf3 = st.columns([2.1, 1.8, .7])
 with colf1:
@@ -502,7 +508,7 @@ if pagina == "📊 Panel Ejecutivo":
     st.write("")
     left, right = st.columns([1, 1])
     with left:
-        st.markdown('<div class="card-panel"><div class="panel-title">Ingresos por tienda (piezas)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel-card"><div class="panel-title">Ingresos por tienda (piezas)</div>', unsafe_allow_html=True)
         if not detalle.empty:
             fig = px.bar(
                 detalle.head(10).sort_values("Total ingresos"),
@@ -519,7 +525,7 @@ if pagina == "📊 Panel Ejecutivo":
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
-        st.markdown('<div class="card-panel"><div class="panel-title">Detalle por tienda</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel-card"><div class="panel-title">Detalle por tienda</div>', unsafe_allow_html=True)
         st.dataframe(detalle, width="stretch", hide_index=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
