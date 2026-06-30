@@ -1,29 +1,10 @@
-# ORION Operaciones Ropa
+# orion-operaciones-ropa
 
-Plataforma para recuperación de mercancía, cambios, muertos, productividad, conversión y reportes ejecutivos.
+Plataforma de indicadores para Recuperación Cambios y Muertos — Operaciones Ropa.
 
-## Versión
-v4.0.0 Base
-
-## Incluye
-- Arquitectura modular.
-- Login por rol: Consulta y Administrador.
-- Persistencia del último Excel cargado.
-- Carga del Excel desde administrador.
-- Normalización inicial.
-- Dashboard base.
-- Estructura lista para fases siguientes.
-
-## Ejecutar localmente
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-## Streamlit Cloud
-- Repository: `orion-operaciones-ropa`
-- Branch: `main`
-- Main file path: `app.py`
-
-## Contraseña administrador default
-`admin123`
+## v4.1.0 Diseño Ejecutivo
+- Se eliminó la palabra ORION de la interfaz visible.
+- Menú desplegable lateral.
+- Panel Ejecutivo como inicio.
+- Tarjetas KPI modernas.
+- Persistencia de Excel.
